@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upload File - File.mom</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap');
+
+body {
+font-family: "Signika Negative", sans-serif;
+background-color: #36393f;
+color: #fff;
+}
+
+.adfile {
+position: absolute;
+margin-top: -50px;
+margin-left: -130px;
+opacity: 0;
+padding: 93px 29px;
+cursor: pointer;
+z-index: 999;
+}
+</style>
+</head>
+<body>
+<center>
+<h1>Upload File</h1>
+<div id="drop-area">
+<div style="border: dashed #949BA4;color: #949BA4;border-radius: 15px;margin: 10px;padding: 50px 10px;font-size: 20px;width: 290px;user-select: none;cursor: pointer;text-align: center;"><svg width="50" height="50" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.2899 2L6 2C3.79086 2 2 3.79086 2 6V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V10.7101C21.3663 10.8987 20.695 11 20 11C16.134 11 13 7.86599 13 4C13 3.30503 13.1013 2.63371 13.2899 2ZM8 6C9.1032 6 10 6.8952 10 8C10 9.1056 9.1032 10 8 10C6.8944 10 6 9.1056 6 8C6 6.8952 6.8944 6 8 6ZM6 18L9 14L11 16L15 11L18 18H6Z" fill="currentColor"></path><path d="M21 0V3H24V5H21V8H19V5H16V3H19V0H21Z" fill="currentColor"></path></svg><div>Upload File by click or paste image from clipboard (Ctrl+V)</div></div>
+</div>
+</center>
+
+  <script>
+
+    function generateRandomName() {
+      return Math.random().toString(36).substring(2, 12);
+    }
+
+    async function uploadFile(file) {
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = async () => {
+    const base64Content = reader.result.split(',')[1];
+    const response = await fetch('https://backend.file.mom', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        filename: file.name,
+        content: base64Content,
+      }),
+    });
+
+    if (response.ok) {
+      const fullurl = 'https://file.mom/' + await response.text();
+      alert(`File uploaded. It will be available at ${fullurl} in a few minutes`);
+    } else if (response.status === 409) {
+      alert('Error uploading. Try again later.');
+    } else {
+      alert('Error uploading.');
+    }
+  };
+  }
+
+    let dropArea = document.getElementById('drop-area');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        dropArea.addEventListener("click", () => {
+            var input = document.createElement("input");
+            input.type = "file";
+            input.onchange = () => {
+                addFile(input.files);
+            };
+            input.click();
+        }, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
+        });
+
+        document.addEventListener('paste', (event) => {
+            const items = event.clipboardData.items;
+            for (const item of items) {
+                if (item.type.indexOf('image') !== -1) {
+                    const file = item.getAsFile();
+                    uploadFile(file);
+                }
+            }
+        });
+        
+        function addFile(files) {
+  if (files.length) {
+    var i = 0;
+    var uploadNextFile = function() {
+      if (i < files.length) {
+        var ngav = files[i];
+        var fr = new FileReader();
+        fr.onloadend = function() {
+          uploadFile(ngav, function() {
+            i++;
+            uploadNextFile();
+          });
+        };
+        fr.readAsDataURL(ngav);
+      } else {
+        updateFileList();
+      }
+    };
+    uploadNextFile();
+  }
+}
+  </script>
+</body>
+</html>
