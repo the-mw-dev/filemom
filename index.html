@@ -57,7 +57,7 @@ z-index: 999;
 
     if (response.ok) {
       const fullurl = 'https://file.mom/' + await response.text();
-      uploadedfile.innerHTML = `<a href="${fullurl}" target="_blank">File uploaded. It will be available at ${fullurl} in a few minutes</a>`;
+      document.getElementById('uploadedfi').innerHTML = `<a href="${fullurl}" target="_blank">File uploaded. It will be available at ${fullurl} in a few minutes</a>`;
       // alert(`File uploaded. It will be available at ${fullurl} in a few minutes`);
     } else if (response.status === 409) {
       alert('Error uploading. Try again later.');
