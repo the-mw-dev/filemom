@@ -1,0 +1,12 @@
+[Interface]
+Address = 10.0.2.3/24
+PrivateKey = +GxS14LY6HBRcwmGxbLdUK/eMF38zweFh3NXH+316nk=
+ListenPort = 51820
+
+DNS = 8.8.8.8, 8.8.4.4
+
+[Peer]
+PublicKey = HMKB8GdMm+NTI0hla9O+lHr06oBKVpGfaqjj9xHe62g=
+AllowedIPs = 10.0.2.2/32
+Endpoint = 194.32.142.11:5101
+PersistentKeepalive = 25
