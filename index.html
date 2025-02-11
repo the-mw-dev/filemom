@@ -8,124 +8,138 @@
 @import url('https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300..700&display=swap');
 
 body {
-font-family: "Signika Negative", sans-serif;
-background-color: #36393f;
-color: #fff;
+    font-family: "Signika Negative", sans-serif;
+    background-color: #1a1d2e;
+    color: #ffffff;
+    text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
-.adfile {
-position: absolute;
-margin-top: -50px;
-margin-left: -130px;
-opacity: 0;
-padding: 93px 29px;
-cursor: pointer;
-z-index: 999;
+h1 {
+    margin-top: 20px;
+}
+
+#drop-area {
+    border: 2px dashed #007bff;
+    border-radius: 15px;
+    margin: 20px auto;
+    padding: 50px 20px;
+    font-size: 20px;
+    width: 320px;
+    user-select: none;
+    cursor: pointer;
+    background-color: #252849;
+    color: #ffffff;
+    transition: 0.3s;
+}
+
+#drop-area:hover {
+    background-color: #2f3256;
+}
+
+#progress-container {
+    display: none;
+    width: 320px;
+    margin: 10px auto;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+#progress-bar {
+    width: 0%;
+    height: 10px;
+    background: #007bff;
+    transition: width 0.1s linear;
 }
 </style>
 </head>
 <body>
-<center>
-<h2 id="uploadedfi"></h2>
-<h1>Upload File</h1>
-<div id="drop-area">
-<div style="border: dashed #949BA4;color: #949BA4;border-radius: 15px;margin: 10px;padding: 50px 10px;font-size: 20px;width: 290px;user-select: none;cursor: pointer;text-align: center;"><svg width="50" height="50" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M13.2899 2L6 2C3.79086 2 2 3.79086 2 6V18C2 20.2091 3.79086 22 6 22H18C20.2091 22 22 20.2091 22 18V10.7101C21.3663 10.8987 20.695 11 20 11C16.134 11 13 7.86599 13 4C13 3.30503 13.1013 2.63371 13.2899 2ZM8 6C9.1032 6 10 6.8952 10 8C10 9.1056 9.1032 10 8 10C6.8944 10 6 9.1056 6 8C6 6.8952 6.8944 6 8 6ZM6 18L9 14L11 16L15 11L18 18H6Z" fill="currentColor"></path><path d="M21 0V3H24V5H21V8H19V5H16V3H19V0H21Z" fill="currentColor"></path></svg><div>Upload File by click or paste image from clipboard (Ctrl+V)</div></div>
-</div>
-</center>
+    <h2 id="uploadedfi"></h2>
+    <h1>Upload File</h1>
+    <div id="drop-area">Click or Drag & Drop files here</div>
+    <div id="progress-container"><div id="progress-bar"></div></div>
 
-  <script>
+    <script>
+      async function uploadFile(file) {
+          return new Promise((resolve, reject) => {
+              document.getElementById('progress-container').style.display = 'block';
+              document.getElementById('progress-bar').style.width = '0%';
 
-    function generateRandomName() {
-      return Math.random().toString(36).substring(2, 12);
-    }
+              const reader = new FileReader();
+              reader.onload = async () => {
+                  let base64Content = reader.result.split(',')[1];
+                  const totalBytes = file.size;
+                  const base64Length = base64Content.length;
+                  const base64Progress = Math.min((base64Length / totalBytes) * 50, 50);
 
-    async function uploadFile(file) {
-  const reader = new FileReader();
-  reader.readAsDataURL(file);
-  reader.onload = async () => {
-    const base64Content = reader.result.split(',')[1];
-    const response = await fetch('https://backend.file.mom', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        filename: file.name,
-        content: base64Content,
-      }),
-    });
+                  document.getElementById('progress-bar').style.width = base64Progress + '%';
+                  if (base64Progress === 50) {
+                      const xhr = new XMLHttpRequest();
+                      xhr.open("POST", "https://backend.file.mom", true);
 
-    if (response.ok) {
-      const fullurl = 'https://file.mom/' + await response.text();
-      document.getElementById('uploadedfi').innerHTML = `File uploaded. It will be available at <a href="${fullurl}" target="_blank">${fullurl}</a> in a few minutes`;
-    } else if (response.status === 409) {
-      alert('Error uploading. Try again later.');
-    } else {
-      alert('Error uploading.');
-    }
-  };
-  }
+                      xhr.upload.onprogress = (event) => {
+                          if (event.lengthComputable) {
+                              let percentComplete = 50 + (event.loaded / event.total) * 50;
+                              document.getElementById('progress-bar').style.width = percentComplete + '%';
+                          }
+                      };
 
-    let dropArea = document.getElementById('drop-area');
+                      xhr.onload = () => {
+                          if (xhr.status === 200) {
+                              document.getElementById('progress-bar').style.width = '100%';
+                              const fullurl = 'https://file.mom/' + xhr.responseText;
+                              document.getElementById('uploadedfi').innerHTML = `File uploaded: <a href="${fullurl}" target="_blank">${fullurl}</a>`;
+                              resolve();
+                          } else {
+                              alert('Error uploading. Try again later.');
+                              reject();
+                          }
+                      };
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, preventDefaults, false);
-            document.body.addEventListener(eventName, preventDefaults, false);
-        });
-        
-        dropArea.addEventListener("click", () => {
-            var input = document.createElement("input");
-            input.type = "file";
-            input.onchange = () => {
-                addFile(input.files);
-            };
-            input.click();
-        }, false);
+                      xhr.onerror = () => {
+                          alert('Upload failed.');
+                          reject();
+                      };
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
+                      const formData = new FormData();
+                      formData.append("file", base64Content);
+                      formData.append("filename", file.name);
+                      xhr.send(formData);
+                  }
+              };
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropArea.addEventListener(eventName, () => dropArea.classList.add('highlight'), false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropArea.addEventListener(eventName, () => dropArea.classList.remove('highlight'), false);
-        });
-
-        document.addEventListener('paste', (event) => {
-            const items = event.clipboardData.items;
-            for (const item of items) {
-                if (item.type.indexOf('image') !== -1) {
-                    const file = item.getAsFile();
-                    uploadFile(file);
-                }
-            }
-        });
-        
-        function addFile(files) {
-  if (files.length) {
-    var i = 0;
-    var uploadNextFile = function() {
-      if (i < files.length) {
-        var ngav = files[i];
-        var fr = new FileReader();
-        fr.onloadend = function() {
-          uploadFile(ngav, function() {
-            i++;
-            uploadNextFile();
+              reader.readAsDataURL(file);
           });
-        };
-        fr.readAsDataURL(ngav);
-      } else {
-        updateFileList();
       }
-    };
-    uploadNextFile();
-  }
-}
-  </script>
+
+      let dropArea = document.getElementById('drop-area');
+      dropArea.addEventListener("click", () => {
+          let input = document.createElement("input");
+          input.type = "file";
+          input.onchange = () => addFile(input.files);
+          input.click();
+      });
+
+      async function addFile(files) {
+          if (files.length) {
+              let i = 0;
+              const uploadNext = async() => {
+                  if (i < files.length) {
+                    try {
+                      await uploadFile(files[i]);
+                      i++;
+                      uploadNext();
+                    } catch (error) {
+                          console.error("Error uploading file: ", files[i].name);
+                      };
+                  }
+              };
+              await uploadNext();
+          }
+      }
+  </script>  
 </body>
 </html>
