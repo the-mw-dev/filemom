@@ -61,11 +61,14 @@ h1 {
     <h1>Upload File</h1>
     <div id="drop-area">Click here and select file</div>
     <div id="progress-container"><div id="progress-bar"></div></div>
+    <p id="up"></p>
     <p>Limit 100mb/file. Max 3 files/10sec</p>
 
     <script>
       async function uploadFile(file) {
           return new Promise((resolve, reject) => {
+              document.getElementByID('uploadedfi').textContent = '';
+              document.getElementByID('up').textContent = 'File will be available in 1-5 minutes after uploading to server.';
               document.getElementById('progress-container').style.display = 'block';
               document.getElementById('progress-bar').style.width = '0%';
 
