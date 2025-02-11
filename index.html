@@ -67,8 +67,8 @@ h1 {
     <script>
       async function uploadFile(file) {
           return new Promise((resolve, reject) => {
-              document.getElementByID('uploadedfi').textContent = '';
-              document.getElementByID('up').textContent = 'File will be available in 1-5 minutes after uploading to server.';
+              document.getElementById('uploadedfi').textContent = '';
+              document.getElementById('up').textContent = 'File will be available in 1-5 minutes after uploading to server.';
               document.getElementById('progress-container').style.display = 'block';
               document.getElementById('progress-bar').style.width = '0%';
 
