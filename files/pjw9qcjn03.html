@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rate Limit Exceeded</title>
+    <style>
+        :root {
+            --bg-color: #1f1b22;
+            --text-color: #ffffff;
+            --primary-color: #ef4444;
+            --secondary-color: #26222c;
+            --hover-color: #555555;
+            --text-muted: #cccccc;
+            --input-bg: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .error-container {
+            background: var(--secondary-color);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .error-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-color);
+        }
+
+        .logo-wrapper {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            position: relative;
+            background: var(--secondary-color);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+            transform: rotate(45deg);
+            border: 2px solid var(--primary-color);
+            overflow: hidden;
+        }
+
+        .logo-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 18px;
+            background: linear-gradient(45deg, transparent 40%, var(--primary-color));
+            opacity: 0.5;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .logo-icon {
+            transform: rotate(-45deg);
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+
+        p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
+        .info-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 20px;
+        }
+
+        .ray-id {
+            color: var(--primary-color);
+            font-family: monospace;
+        }
+
+        .retry-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 32px;
+            border-radius: 24px;
+            font-weight: 500;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .retry-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="logo-wrapper">
+            <div class="logo-icon">⌛</div>
+        </div>
+        
+        <h1>Rate Limit Exceeded</h1>
+        <p>You have sent too many requests in a given amount of time. Please slow down and try again later.</p>
+
+        <button onclick="window.location.reload()" class="retry-button">
+            Try Again
+        </button>
+
+        <div class="info-text">
+            <span>IP: ::CLIENT_IP::</span>
+            • 
+            <span>Ray ID: <span class="ray-id">::RAY_ID::</span></span>
+        </div>
+    </div>
+</body>
+</html>
